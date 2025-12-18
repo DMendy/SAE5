@@ -151,18 +151,11 @@ def supprimer_produits(db):
     pass
 
 
-# Exécution du script
-if __name__ == "__main__":
-    # Connexion à MongoDB
-    db = connect_mongo()
-    get_clients(db)
-    #db = client["magasin"]
-    #print(get_product_price(db,ObjectId('69416c996ac222fe513f118c')))
-    # Exemple d'insertion d'un client
-    #insert_client(db, "Dupont", "Jean", "jean.dupont@mail.com", "2025-12-18")
-
-    # Exemple de recherche de produit par prix
-    #afficher_produits_prix_superieur(db, 50)
-
-    # Exemple de calcul du chiffre d'affaires
-    #calculer_chiffre_affaires(db)
+"""
+Complète cette dernière fonction qui doit réaliser ces 3 étapes : 
+    -Créer une vente
+    -Mettre à jour le stock des produits vendus
+    -Mettre à jour l'historique du client
+"""
+def vente_client(db,produits_ids,id_client):
+    pass
