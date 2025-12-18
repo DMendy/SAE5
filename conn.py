@@ -140,11 +140,6 @@ def modifier_prix_produit(db,id_produit, nouveau_prix):
     print(f"Le prix du produit {id_produit} a été modifié à {nouveau_prix}.")
 
 
-
-
-
-
-
 """
 Incrémenter le stock d'un produit
 """
@@ -175,45 +170,6 @@ def supprimer_ventes_client(db, clientId):
     db.ventes.delete_many({"clientId": clientId})
     print(f"Toutes les ventes du client {clientId} ont été supprimées.")
 
-
-"""
-
-"""
-# Rechercher les ventes réalisées sur une période donnée
-def rechercher_ventes_par_periode(db, date_debut, date_fin):
-    ventes = db.ventes.find({
-        "dateVente": {"$gte": datetime.strptime(date_debut, "%Y-%m-%d"), "$lte": datetime.strptime(date_fin, "%Y-%m-%d")}
-    })
-    for vente in ventes:
-        print(vente)
-
-
-
-"""
-
-"""
-# Utiliser les opérateurs $gt et $lt pour rechercher des produits par prix
-def rechercher_produits_par_prix(db, min_prix, max_prix):
-    produits = db.produits.find({"prix": {"$gt": min_prix, "$lt": max_prix}})
-    for produit in produits:
-        print(produit)
-
-
-
-"""
-
-"""
-# Calculer le chiffre d'affaires total du magasin
-def calculer_chiffre_affaires(db):
-    result = db.ventes.aggregate([
-        {"$unwind": "$produits"},
-        {"$group": {
-            "_id": None,
-            "chiffreAffaires": {"$sum": {"$multiply": ["$produits.prix", "$produits.quantite"]}}
-        }}
-    ])
-    for r in result:
-        print(f"Chiffre d'affaires total : {r['chiffreAffaires']}")
 
 
 
