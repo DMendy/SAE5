@@ -24,14 +24,14 @@ auth_db = None
 
 # URI de connexion MongoDB
 mongo_uri = f"mongodb://{mongo_user}:{mongo_password}@{rpi_ip}:{mongo_port}/?authSource={auth_db}"
-mongo_uri2 = f"mongodb://admin:password@192.168.25.24:27017/?authSource=admin"
+#mongo_uri2 = f"mongodb://admin:password@192.168.25.24:27017/?authSource=admin"
 
 
 # Connexion à MongoDB
-def connect_mongo():
+def connect_mongo():    
     try:
         print(f"Connexion à MongoDB sur {rpi_ip}:{mongo_port}...")
-        client = MongoClient(mongo_uri2)
+        client = MongoClient(mongo_uri)
         print("Connexion réussie à MongoDB!")
         return client['magasin']
     except Exception as e:
@@ -68,21 +68,20 @@ def insert_client(db, nom, prenom, email):
     print(f"Client {nom} {prenom} ajouté avec succès.")
 
 """
-En t'aidant de la fonction précédente, complete la fonction insert_produit
+En t'aidant des fonctions précédentes, complète la fonction insert_produit
 """
 def insert_produit(db, nom, prix, categorie, stock):
     pass
 
 
 
-"""
-Complète la fonction get_client pour trouver un client à partir de son id
-"""
+#Fonction qui permet de retrouver un client depuis son id
 def get_client(db, id):
     return db.clients.find_one({"_id": id})
 
+
 """
-Recherche un client à l'aide de son email
+Complète la fonction suivante pour qu'elle permette de trouver un client à l'aide de son email
 """
 def get_client_by_email(db, email):
     pass
@@ -95,28 +94,11 @@ def get_product_price(db,id):
     pass
 
 
-produits= [
-      {
-        "produit_id": ObjectId('6942b26b9a4ec022e53f1190'),
-        "quantite": 2,
-        "prix_unitaire": 15
-      },
-      {
-        "produit_id": ObjectId('69416ec66ac222fe513f118f'),
-        "quantite": 1,
-        "prix_unitaire": 20
-      },
-      {
-        "produit_id": ObjectId('69416e496ac222fe513f118d'),
-        "quantite": 3,
-        "prix_unitaire": 10.99
-      }
-    ]
 
 """
-Créé une fonction qui calcule le prix total d'une vente. Somme de quantite X prix_unitaire de chaque produit.
+Créé une fonction qui calcule le prix total d'une vente sans utiliser l'attribut total_vente. Somme de quantite * prix_unitaire de chaque produit.
 """
-def total_vente(produits):
+def total_vente(db,id_vente):
     pass
 
 
@@ -168,23 +150,6 @@ Supprimer tous les produits qui n'ont plus de stock
 def supprimer_produits(db):
     pass
 
-
-"""
-
-"""
-# Trouver le produit le plus vendu
-def produit_le_plus_vendu(db):
-    result = db.ventes.aggregate([
-        {"$unwind": "$produits"},
-        {"$group": {
-            "_id": "$produits.produitId",
-            "totalVendu": {"$sum": "$produits.quantite"}
-        }},
-        {"$sort": {"totalVendu": -1}},
-        {"$limit": 1}
-    ])
-    for r in result:
-        print(f"Produit le plus vendu : {r}")
 
 # Exécution du script
 if __name__ == "__main__":
