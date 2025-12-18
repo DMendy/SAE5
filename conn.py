@@ -33,15 +33,16 @@ def connect_mongo():
         print(f"Connexion à MongoDB sur {rpi_ip}:{mongo_port}...")
         client = MongoClient(mongo_uri2)
         print("Connexion réussie à MongoDB!")
-        return client
+        return client['magasin']
     except Exception as e:
         print(f"Erreur de connexion à MongoDB : {e}")
         sys.exit(1)
 
+#Fonction qui permet d'afficher toutes les collections de la database
 def show_tables(db):
     return db.list_collection_names()
 
-
+#Fonction qui permet d'afficher toutes les lignes de la collection clients
 def get_clients(db):
     clients = db.clients.find()
     for client in clients:
@@ -55,9 +56,7 @@ def get_produits(db):
 def get_ventes(db):
     pass
 
-"""
-A l'aide de la fonction insert_client, insère une ligne client dans la base de donnée
-"""
+#Fonction qui permet d'ajouter un client à la base de données
 def insert_client(db, nom, prenom, email):
     ajd = str(datetime.now())
     db.clients.insert_one({
@@ -127,22 +126,24 @@ Affiche les noms de produits dont le prix est supérieur à un prix donné
 def afficher_produits_prix_superieur(db, prix):
     pass
 
+#Fonction qui permet de modifier le nom d'un client
+def modifier_nom_client(db,id_client,nouveau_nom):
+    db.clients.update_one(
+        {"_id": id_client},
+        {"$set": {"nom": nouveau_nom}}
+    )
+    print(f"Le stock du produit {id_client} a été incrémenté de {nouveau_nom}.")
 
 
 """
-Modifier le prix d'un produit
+À partir de la fonction précédente, complète la fonction suivante pour modifier le prix d'un produit à partir de son id
 """
 def modifier_prix_produit(db,id_produit, nouveau_prix):
-    db.produits.update_one(
-        {"_id": id_produit},
-        {"$set": {"prix": nouveau_prix}}
-    )
-    print(f"Le prix du produit {id_produit} a été modifié à {nouveau_prix}.")
+    pass
 
 
-"""
-Incrémenter le stock d'un produit
-"""
+
+#Incrémenter le stock d'un produit
 def incrementer_stock_produit(db, produit_nom, quantite):
     db.produits.update_one(
         {"nom": produit_nom},
@@ -150,27 +151,22 @@ def incrementer_stock_produit(db, produit_nom, quantite):
     )
     print(f"Le stock du produit {produit_nom} a été incrémenté de {quantite}.")
 
+"""En se basant sur la fonction précéddente, complète la fonction suivante pour qu'elle 
+retire des stocks concernés les produits présents dans une vente donnée."""
+def update_stock_apres_vente(db,id_vente):
+    pass
 
-
-"""
-
-"""
-# Supprimer un client par email
+# Supprime un client par id
 def supprimer_client(db, email):
     db.clients.delete_one({"email": email})
     print(f"Le client avec l'email {email} a été supprimé.")
 
 
-
+""" 
+Supprimer tous les produits qui n'ont plus de stock
 """
-
-"""
-# Supprimer toutes les ventes d'un client
-def supprimer_ventes_client(db, clientId):
-    db.ventes.delete_many({"clientId": clientId})
-    print(f"Toutes les ventes du client {clientId} ont été supprimées.")
-
-
+def supprimer_produits(db):
+    pass
 
 
 """
@@ -193,9 +189,9 @@ def produit_le_plus_vendu(db):
 # Exécution du script
 if __name__ == "__main__":
     # Connexion à MongoDB
-    client = connect_mongo()
-    db = client["magasin"]
+    db = connect_mongo()
     get_clients(db)
+    #db = client["magasin"]
     #print(get_product_price(db,ObjectId('69416c996ac222fe513f118c')))
     # Exemple d'insertion d'un client
     #insert_client(db, "Dupont", "Jean", "jean.dupont@mail.com", "2025-12-18")
