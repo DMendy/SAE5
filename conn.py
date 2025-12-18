@@ -42,20 +42,31 @@ def show_tables(db):
     return db.list_collection_names()
 
 
+def get_clients(db):
+    clients = db.clients.find()
+    for client in clients:
+        print(client)
+"""
+En reprenant la fonction get_clients, complète les deux fonctions suivantes.
+"""
+def get_produits(db):
+    pass
+
+def get_ventes(db):
+    pass
 
 """
 A l'aide de la fonction insert_client, insère une ligne client dans la base de donnée
 """
-def insert_client(db, nom, prenom, email, dateInscription):
+def insert_client(db, nom, prenom, email):
+    ajd = str(datetime.now())
     db.clients.insert_one({
         "nom": nom,
         "prenom": prenom,
         "email": email,
-        "dateInscription": datetime.strptime(dateInscription, "%Y-%m-%d")
+        "dateInscription": datetime.strptime(ajd, "%Y-%m-%d")
     })
     print(f"Client {nom} {prenom} ajouté avec succès.")
-
-
 
 """
 En t'aidant de la fonction précédente, complete la fonction insert_produit
@@ -65,69 +76,53 @@ def insert_produit(db, nom, prix, categorie, stock):
 
 
 
-def get_clients(db):
-    clients = db.clients.find()
-    for client in clients:
-        print(client)
-
-
 """
 Complète la fonction get_client pour trouver un client à partir de son id
 """
 def get_client(db, id):
+    return db.clients.find_one({"_id": id})
+
+"""
+Recherche un client à l'aide de son email
+"""
+def get_client_by_email(db, email):
     pass
 
+
+"""
+Complète la fonction get_product_price pour qu'elle retrouve le prix d'un produit grâce à son id
+"""
 def get_product_price(db,id):
-    return db.produits.find_one({"_id": id},{"prix": 1,"_id":0})
+    pass
+
+
+produits= [
+      {
+        "produit_id": ObjectId('6942b26b9a4ec022e53f1190'),
+        "quantite": 2,
+        "prix_unitaire": 15
+      },
+      {
+        "produit_id": ObjectId('69416ec66ac222fe513f118f'),
+        "quantite": 1,
+        "prix_unitaire": 20
+      },
+      {
+        "produit_id": ObjectId('69416e496ac222fe513f118d'),
+        "quantite": 3,
+        "prix_unitaire": 10.99
+      }
+    ]
 
 """
 Créé une fonction qui calcule le prix total d'une vente. Somme de quantite X prix_unitaire de chaque produit.
 """
 def total_vente(produits):
-    """Modèle de produits
-    produits = [
-        {
-            produit_id,
-            quantite,
-            prix_unitaire
-        },...
-    ]
-    """
     pass
 
 
-
 """
-Insère une vente avec plusieurs produits
-"""
-def insert_vente(db, clientId, produits, dateVente):
-    db.ventes.insert_one({
-        "clientId": clientId,
-        "produits": produits,
-        "dateVente": datetime.strptime(dateVente, "%Y-%m-%d"),
-        "total_vente":total_vente(produits)
-    })
-    print(f"Vente ajoutée pour le client {clientId}.")
-
-
-
-
-
-
-"""
-Recherche un client à l'aide de son email
-"""
-def rechercher_client_par_email(db, email):
-    client = db.clients.find_one({"email": email})
-    if client:
-        print(client)
-    else:
-        print(f"Aucun client trouvé avec l'email {email}.")
-
-
-
-"""
-Affiche les produits dont le prix est supérieur à 50 €
+Affiche les noms de produits dont le prix est supérieur à un prix donné
 """
 def afficher_produits_prix_superieur(db, prix):
     pass
@@ -135,36 +130,18 @@ def afficher_produits_prix_superieur(db, prix):
 
 
 """
-Trie les produits par prix croissant
-"""
-def trier_produits_par_prix(db):
-    produits = db.produits.find().sort("prix", 1)  # 1 pour croissant, -1 pour décroissant
-    for produit in produits:
-        print(produit)
-
-
-
-"""
 Modifier le prix d'un produit
 """
-def modifier_prix_produit(db, produit_nom, nouveau_prix):
+def modifier_prix_produit(db,id_produit, nouveau_prix):
     db.produits.update_one(
-        {"nom": produit_nom},
+        {"_id": id_produit},
         {"$set": {"prix": nouveau_prix}}
     )
-    print(f"Le prix du produit {produit_nom} a été modifié à {nouveau_prix}.")
+    print(f"Le prix du produit {id_produit} a été modifié à {nouveau_prix}.")
 
 
 
-"""
-Ajouter un champ fidélité à un client
-"""
-def ajouter_fidelite_client(db, email, fidelite):
-    db.clients.update_one(
-        {"email": email},
-        {"$set": {"fidelite": fidelite}}  # Ajoute le champ fidélité au client
-    )
-    print(f"Le client avec l'email {email} a reçu le statut fidélité {fidelite}.")
+
 
 
 
@@ -197,18 +174,6 @@ def supprimer_client(db, email):
 def supprimer_ventes_client(db, clientId):
     db.ventes.delete_many({"clientId": clientId})
     print(f"Toutes les ventes du client {clientId} ont été supprimées.")
-
-
-
-"""
-
-"""
-# Rechercher un produit par catégorie
-def rechercher_produit_par_categorie(db, categorie):
-    produits = db.produits.find({"categorie": categorie})
-    for produit in produits:
-        print(produit)
-
 
 
 """
@@ -274,7 +239,8 @@ if __name__ == "__main__":
     # Connexion à MongoDB
     client = connect_mongo()
     db = client["magasin"]
-    print(get_product_price(db,ObjectId('69416c996ac222fe513f118c')))
+    get_clients(db)
+    #print(get_product_price(db,ObjectId('69416c996ac222fe513f118c')))
     # Exemple d'insertion d'un client
     #insert_client(db, "Dupont", "Jean", "jean.dupont@mail.com", "2025-12-18")
 
