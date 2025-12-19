@@ -36,16 +36,17 @@ def connect_mongo():
     except Exception as e:
         print(f"Erreur de connexion à MongoDB : {e}")
         sys.exit(1)
-
+db = connect_mongo()
 #Fonction qui permet d'afficher toutes les collections de la database
 def show_tables(db):
-    return db.list_collection_names()
+    print(db.list_collection_names())
 
 #Fonction qui permet d'afficher toutes les lignes de la collection clients
 def get_clients(db):
     clients = db.clients.find()
     for client in clients:
         print(client)
+
 """
 En reprenant la fonction get_clients, complète les deux fonctions suivantes.
 """
@@ -66,7 +67,7 @@ def insert_client(db, nom, prenom, email):
         "nom": nom,
         "prenom": prenom,
         "email": email,
-        "dateInscription": datetime.strptime(ajd, "%Y-%m-%d")
+        "dateInscription": ajd
     })
     print(f"Client {nom} {prenom} ajouté avec succès.")
 
@@ -89,12 +90,12 @@ def insert_produit(db, nom, prix, categorie, stock):
 def get_client(db, id):
     return db.clients.find_one({"_id": id})
 
-
 """
 Complète la fonction suivante pour qu'elle permette de trouver un client à l'aide de son email
 """
 def get_client_by_email(db, email):
     return db.clients.find_one({"mail": email})
+
 
 
 """
@@ -104,23 +105,21 @@ def get_product_price(db,id):
     return db.produits.find_one({"_id":id},{"_id":0,"prix":1})
 
 
-
 """
 Créé une fonction qui calcule le prix total d'une vente sans utiliser l'attribut total_vente. Somme de quantite * prix_unitaire de chaque produit.
 """
 def total_vente(db,id_vente):
     somme=0
-    produits =  db.ventes.find_one({"_id":id_vente},{"_id":0,"produits":1})
+    produits =  db.ventes.find_one({"_id":id_vente},{"_id":0,"produits":1}).get("produits")
     for produit in produits:
         somme+=produit.get("prix_unitaire")*produit.get("quantite")
     return somme
-
 
 """
 Affiche les noms de produits dont le prix est supérieur à un prix donné
 """
 def afficher_produits_prix_superieur(db, prix):
-    produits = db.produits.find({ "prix": { "$gt": prix } })
+    produits = db.produits.find({ "prix": { "$gte": prix } })
     for produit in produits:
         print(produit)
 
@@ -138,7 +137,7 @@ def modifier_nom_client(db,id_client,nouveau_nom):
 À partir de la fonction précédente, complète la fonction suivante pour modifier le prix d'un produit à partir de son id
 """
 def modifier_prix_produit(db,id_produit, nouveau_prix):
-    ancien_prix = get_product_price(db,id_produit)
+    ancien_prix = get_product_price(db,id_produit).get("prix")
     db.produits.update_one(
         {"_id":id_produit},
         {"$set":{"prix":nouveau_prix}}
@@ -147,33 +146,34 @@ def modifier_prix_produit(db,id_produit, nouveau_prix):
 
 
 
-
 #Incrémenter le stock d'un produit depuis son nom
-def incrementer_stock_produit(db, produit_nom, quantite):
+def incrementer_stock_produit_depuis_nom(db, produit_nom, quantite):
     db.produits.update_one(
         {"nom": produit_nom},
         {"$inc": {"stock": quantite}}  # Incrémenter le stock
     )
     print(f"Le stock du produit {produit_nom} a été incrémenté de {quantite}.")
 
+
 """En se basant sur la fonction précéddente, complète la fonction suivante pour qu'elle 
 retire des stocks concernés les produits présents dans une vente donnée."""
 def update_stock_apres_vente(db,id_vente):
     produits =  db.ventes.find_one({"_id":id_vente},{"_id":0,"produits":1})
-    for produitVente in produits:
+    for produitVente in produits.get("produits"):
         db.produits.update_one(
             {"_id":produitVente.get("produit_id")},
             {"$inc": {"stock": -produitVente.get("quantite")}}
         )
         print(f'Le stock du produit {produitVente.get("produit_id")} a diminué de {produitVente.get("quantite")}')
-        
+
 
 
 # Supprime un client par mail
 def supprimer_client_mail(db, email):
-    db.clients.delete_one({"email": email})
+    db.clients.delete_one({"mail": email})
     print(f"Le client avec l'email {email} a été supprimé.")
-
+supprimer_client_mail(db,"debast@gmail.com")
+print(get_client_by_email(db,"debast@gmail.com"))
 
 """ 
 Supprimer tous les produits qui n'ont plus de stock
