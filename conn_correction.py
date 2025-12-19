@@ -168,12 +168,11 @@ def update_stock_apres_vente(db,id_vente):
 
 
 
-# Supprime un client par mail
+# Supprime un client par son mail
 def supprimer_client_mail(db, email):
     db.clients.delete_one({"mail": email})
     print(f"Le client avec l'email {email} a été supprimé.")
-supprimer_client_mail(db,"debast@gmail.com")
-print(get_client_by_email(db,"debast@gmail.com"))
+
 
 """ 
 Supprimer tous les produits qui n'ont plus de stock
@@ -184,6 +183,7 @@ def supprimer_produits(db):
         nom = produit.get("nom")
         db.produits.delete_one({"_id":produit.get("_id")})
         print(f"Le produit {nom} a été supprimé car nous n'avions plus de stock")
+
 
 """
 Complète cette dernière fonction qui doit réaliser ces 3 étapes : 
@@ -219,7 +219,7 @@ def vente_client(db,liste_produit,id_client):
         {"$push":{"historique":vente.inserted_id}}
     )
 
-
+#Permet de réinitialiser la db
 def reset_magasin_from_admin(client):
     SOURCE_DB = "admin"
     TARGET_DB = "magasin"
@@ -259,4 +259,3 @@ def reset_magasin_from_admin(client):
             print(f"Collection '{col}' inexistante dans admin.")
 
     print("Base 'magasin' recréée depuis 'admin'.")
-

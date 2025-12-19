@@ -24,7 +24,7 @@ auth_db = None
 
 # URI de connexion MongoDB
 mongo_uri = f"mongodb://{mongo_user}:{mongo_password}@{rpi_ip}:{mongo_port}/?authSource={auth_db}"
-#mongo_uri2 = f"mongodb://admin:password@192.168.25.24:27017/?authSource=admin"
+
 
 
 # Connexion à MongoDB
@@ -63,7 +63,7 @@ def insert_client(db, nom, prenom, email):
         "nom": nom,
         "prenom": prenom,
         "email": email,
-        "dateInscription": datetime.strptime(ajd, "%Y-%m-%d")
+        "dateInscription": ajd
     })
     print(f"Client {nom} {prenom} ajouté avec succès.")
 
@@ -110,11 +110,13 @@ def afficher_produits_prix_superieur(db, prix):
 
 #Fonction qui permet de modifier le nom d'un client
 def modifier_nom_client(db,id_client,nouveau_nom):
+    ancien_nom = db.clients.find_one({"_id":id_client},{"_id":0,"nom":1})
     db.clients.update_one(
         {"_id": id_client},
         {"$set": {"nom": nouveau_nom}}
     )
-    print(f"Le stock du produit {id_client} a été incrémenté de {nouveau_nom}.")
+    print(f"Le nom du produit {id_client} a été changé de {ancien_nom} en {nouveau_nom}.")
+    
 
 
 """
@@ -125,7 +127,7 @@ def modifier_prix_produit(db,id_produit, nouveau_prix):
 
 
 
-#Incrémenter le stock d'un produit
+#Incrémenter le stock d'un produit depuis son nom
 def incrementer_stock_produit(db, produit_nom, quantite):
     db.produits.update_one(
         {"nom": produit_nom},
@@ -138,8 +140,8 @@ retire des stocks concernés les produits présents dans une vente donnée."""
 def update_stock_apres_vente(db,id_vente):
     pass
 
-# Supprime un client par id
-def supprimer_client(db, email):
+# Supprime un client par son mail
+def supprimer_client_mail(db, email):
     db.clients.delete_one({"email": email})
     print(f"Le client avec l'email {email} a été supprimé.")
 
@@ -164,12 +166,6 @@ def vente_client(db,produits_ids,id_client):
 def reset_magasin_from_admin(client):
     SOURCE_DB = "admin"
     TARGET_DB = "magasin"
-
-    confirm = input(" Réinitialiser la base magasin ? (oui/non) : ")
-    if confirm != "oui":
-        print(" Réinitialisation annulée ")
-        return
-
 
     while True :
         confirm = input("Réinitialiser la base magasin ? (oui/non) : ").strip().lower()
