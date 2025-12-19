@@ -165,7 +165,22 @@ def reset_magasin_from_admin(client):
     SOURCE_DB = "admin"
     TARGET_DB = "magasin"
 
-    client.drop_database(TARGET_DB)
+    while True :
+        confirm = input("Réinitialiser la base magasin ? (oui/non) : ").strip().lower()
+
+        if confirm == "oui":
+            break
+        elif confirm == "non":
+            print("Réinitialisation annulée")
+            return
+        else:
+            print("Réponse invalide, merci de répondre par 'oui' ou par 'non'")
+
+    try:
+        client.drop_database(TARGET_DB)
+    except Exception as e:
+        print("Erreur lors de la suppression :", e)
+        return
     print("Base 'magasin' supprimée.")
 
     source = client[SOURCE_DB]
