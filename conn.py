@@ -159,3 +159,29 @@ Complète cette dernière fonction qui doit réaliser ces 3 étapes :
 """
 def vente_client(db,produits_ids,id_client):
     pass
+
+#Permet de réinitialiser la db
+def reset_magasin_from_admin(client):
+    SOURCE_DB = "admin"
+    TARGET_DB = "magasin"
+
+    client.drop_database(TARGET_DB)
+    print("Base 'magasin' supprimée.")
+
+    source = client[SOURCE_DB]
+    target = client[TARGET_DB]
+
+    collections = ["clients", "produits", "ventes"]
+
+    for col in collections:
+        if col in source.list_collection_names():
+            docs = list(source[col].find())
+            if docs:
+                target[col].insert_many(docs)
+                print(f"Collection '{col}' copiée ({len(docs)} documents).")
+            else:
+                print(f"Collection '{col}' vide, rien à copier.")
+        else:
+            print(f"Collection '{col}' inexistante dans admin.")
+
+    print("Base 'magasin' recréée depuis 'admin'.")
